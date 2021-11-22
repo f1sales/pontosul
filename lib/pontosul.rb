@@ -12,27 +12,27 @@ module Pontosul
         {
           email_id: 'website',
           name: 'Website'
-        },
+        }
       ]
     end
   end
 
   class F1SalesCustom::Email::Parser
     def parse
-      parsed_email = @email.body.colons_to_hash(/(Telefone|Portas|Km|Combustivel|Ano|Modelo|Cambio|Versao|Preco|Celular|Origem|Nome|Email|Site|Mensagem|Marca).*?:/, false)
+      parsed_email = @email.body.colons_to_hash(/(Nome|Telefone|Email|Qual é o veículo do seu interesse?|Qual é sua ideia de negocio?|Qual o valor de entrada:|Date).*?:/,false)
+      entry_value = parsed_email['qual_o_valor_de_entrada'].split("\n").first
 
       {
         source: {
-          name: F1SalesCustom::Email::Source.all[0][:name],
+          name: F1SalesCustom::Email::Source.all[0][:name]
         },
         customer: {
           name: parsed_email['nome'],
           phone: parsed_email['telefone'].tr('^0-9', ''),
           email: parsed_email['email']
         },
-        product: "#{parsed_email['marca']} #{parsed_email['modelo']} #{parsed_email['ano']}",
-        message: (parsed_email['mensagem']).gsub("\n", ' ').strip,
-        description: "Preço #{parsed_email['preco']} #{parsed_email['cambio']} #{parsed_email['combustivel']}",
+        product: parsed_email['qual__o_veculo_do_seu_interesse'],
+        description: "#{parsed_email['qual__sua_ideia_de_negocio']} - #{entry_value}"
       }
     end
   end
